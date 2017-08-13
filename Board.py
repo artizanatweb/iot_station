@@ -1,6 +1,5 @@
 import time
 import network
-import sys
 from Relay import Relay
 from SettingsSingleton import SettingsSingleton
 # load all sensor classes
@@ -14,6 +13,7 @@ class Board:
         self.staIf = network.WLAN(network.STA_IF)
         self.bRelays = {}
         self.b_sensors = []
+        self.has_relays = None
         self.has_sensors = None
         self.sensors_values = {}
 
@@ -47,12 +47,18 @@ class Board:
     def relays(self):
         relays = self.settings.get('relays')
         if not (len(relays) > 0):
+            self.has_relays = False
             return False
 
         for relayName, relaySettings in relays.items():
             relay = Relay(relayName)
             relay.setup()
             self.bRelays[relayName] = relay
+
+        if len(self.bRelays) > 0:
+            self.has_relays = True
+        else:
+            self.has_relays = False
 
     def sensors(self):
         c_sensors = self.settings.get('sensors')
@@ -80,17 +86,18 @@ class Board:
 
     def loop(self):
         while True:
-            for relay_name in self.bRelays:
-                relay_object = self.bRelays[relay_name]
-                # check if there is a server message for this relay
+            if self.has_relays is True:
+                for relay_name in self.bRelays:
+                    relay_object = self.bRelays[relay_name]
+                    # check if there is a server message for this relay
+                    # -- to do --
+                    # check if relay has a button
+                    if relay_object.button is None:
+                        continue
+                    # check if relay button has been pressed
+                    relay_object.check_button()
 
-                # check if relay has a button and if button has been pressed
-                if relay_object.button is None:
-                    continue
-
-                relay_object.check_button()
-
-            if self.has_sensors:
+            if self.has_sensors is True:
                 for sensor in self.b_sensors:
                     self.sensors_values[sensor.get_name()] = sensor.get_value()
 

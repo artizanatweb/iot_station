@@ -122,3 +122,6 @@ class Relay:
             return False
 
         return True
+
+    def get_name(self):
+        return self.name
