@@ -24,5 +24,11 @@
             "invert": "false",
             "default_led_state": 0
         }
+    },
+    "sensors": {
+        "default_light_sensor": {
+            "type": "light",
+            "pin": 0
+        }
     }
 }

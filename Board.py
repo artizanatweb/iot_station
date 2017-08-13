@@ -1,8 +1,11 @@
-import sys
 import time
 import network
-from SettingsSingleton import SettingsSingleton
+import sys
 from Relay import Relay
+from SettingsSingleton import SettingsSingleton
+# load all sensor classes
+from LightSensor import LightSensor
+from TemperatureSensor import TemperatureSensor
 
 
 class Board:
@@ -10,12 +13,16 @@ class Board:
         self.settings = SettingsSingleton.getInstance()
         self.staIf = network.WLAN(network.STA_IF)
         self.bRelays = {}
+        self.b_sensors = []
+        self.has_sensors = None
+        self.sensors_values = {}
 
     def setup(self):
         self.settings.load()
         self.staIf.active(True)
         self.wifi()
         self.relays()
+        self.sensors()
         # connect to server
         # and report relays status and sensors values
 
@@ -48,10 +55,28 @@ class Board:
             self.bRelays[relayName] = relay
 
     def sensors(self):
-        # light sensor on ESP-12F Witty
-        # adc = machine.ADC(0)
-        # adc.read() -- 29->384
-        pass
+        c_sensors = self.settings.get('sensors')
+        if not (len(c_sensors) > 0):
+            self.has_sensors = False
+            return False
+
+        for sensorName, sensorSettings in c_sensors.items():
+            try:
+                pin_number = int(sensorSettings['pin'])
+                sensor_type = sensorSettings['type']
+                fl = sensor_type[0].upper()
+                class_name = fl + sensor_type[1:] + "Sensor"
+                sensor = eval(class_name)(sensorName, pin_number)
+                sensor.setup()
+                self.b_sensors.append(sensor)
+            except:
+                print("Error on sensor: " + sensorName)
+                continue
+
+        if len(self.b_sensors) > 0:
+            self.has_sensors = True
+        else:
+            self.has_sensors = False
 
     def loop(self):
         while True:
@@ -64,6 +89,10 @@ class Board:
                     continue
 
                 relay_object.check_button()
+
+            if self.has_sensors:
+                for sensor in self.b_sensors:
+                    self.sensors_values[sensor.get_name()] = sensor.get_value()
 
             # nani
             time.sleep(0.5)
