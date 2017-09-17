@@ -1,0 +1,34 @@
+{
+    "cfg": {
+        "ssid": "wifi_ssid",
+        "pass": "wifi_password"
+    },
+    "server_port": 6335,
+    "server_address": "server_ip_address",
+    "board_led": "6",
+    "button_pressed_time": 2000,
+    "type": "station",
+    "code": "station_code",
+    "relays": {
+        "relay_1_name": {
+            "button_pin":4,
+            "led_pin":2,
+            "relay_pin":5,
+            "invert": "false",
+            "default_led_state": 1
+        },
+        "relay_2_name": {
+            "button_pin":14,
+            "led_pin":16,
+            "relay_pin":13,
+            "invert": "false",
+            "default_led_state": 0
+        }
+    },
+    "sensors": {
+        "default_light_sensor": {
+            "type": "light",
+            "pin": 0
+        }
+    }
+}
