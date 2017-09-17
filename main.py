@@ -10,7 +10,8 @@ if __name__ == '__main__':
     try:
         board.setup()
         board.loop()
-    except:
+    except Exception as e:
+        # print(e)
         print("Can't run board loop!")
         sys.exit(1)
 

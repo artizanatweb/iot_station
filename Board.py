@@ -1,5 +1,6 @@
 import time
 import network
+import sys
 from Relay import Relay
 from SettingsSingleton import SettingsSingleton
 # load all sensor classes
@@ -62,6 +63,10 @@ class Board:
 
     def sensors(self):
         c_sensors = self.settings.get('sensors')
+        if not c_sensors:
+            self.has_sensors = False
+            return False
+
         if not (len(c_sensors) > 0):
             self.has_sensors = False
             return False
